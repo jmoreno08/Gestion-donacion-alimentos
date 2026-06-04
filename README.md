@@ -51,7 +51,7 @@ El sistema permitirá:
 
 # Distribución del Trabajo
 
-## Integrante 1 – Análisis de la Problemática y Descripción del Sistema
+## Jonathan Moreno Nuñez – Análisis de la Problemática y Descripción del Sistema
 
 ### Responsabilidades
 
