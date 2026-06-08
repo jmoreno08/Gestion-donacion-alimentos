@@ -101,7 +101,7 @@ El sistema permitirá:
 
 ---
 
-## Integrante 4 – Implementación de DAO y DTO
+## Keith Dunwell Villalobos – Implementación de DAO y DTO
 
 ### Responsabilidades
 
