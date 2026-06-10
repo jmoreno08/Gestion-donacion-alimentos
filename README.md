@@ -1,5 +1,13 @@
 # Sistema de Gestión de Donación de Alimentos
 
+# Integrantes
+
+1. JADE CUARAN LEURO
+2. CARLOS ANDRÉS VARGAS MESA
+3. KEITH DUNWEL VILLALOBOS
+4. JONATHAN MORENO NÚÑEZ
+5. JUAN QUIN
+
 ## Descripción
 
 El Sistema de Gestión de Donación de Alimentos es un proyecto académico enfocado en el diseño e implementación de una base de datos relacional normalizada para administrar procesos de donación de alimentos. El sistema permite a fundaciones, organizaciones sociales y grupos comunitarios registrar donantes, donaciones, productos alimenticios, beneficiarios y entregas de manera organizada y trazable.
