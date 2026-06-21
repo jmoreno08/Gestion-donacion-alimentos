@@ -2,55 +2,70 @@
 
 **Proyecto:** Sistema de Gestión de Donación de Alimentos  
 **Tema:** Modelo relacional, llaves primarias, llaves foráneas, cardinalidades y normalización 1FN, 2FN y 3FN  
-**Autor base del planteamiento:** Juan Camilo Quintero Atoy  
+**Autor:** Juan Camilo Quintero Atoy  
+**Documento corregido según comentario de revisión:** Se ajustan las relaciones entre `detalle_donacion`, `productos`, `detalle_entrega` y `entregas` para evitar ciclos cerrados y ambigüedad en el modelo.
 
 ---
 
 ## 1. Objetivo del modelo de base de datos
 
-Diseñar un modelo relacional normalizado que permita registrar, consultar y controlar todo el proceso de donación de alimentos, desde el ingreso de los productos donados hasta su entrega a los beneficiarios.
+Diseñar un modelo relacional normalizado que permita registrar, consultar y controlar el proceso de donación de alimentos, desde la recepción de los productos donados hasta su entrega a los beneficiarios, garantizando trazabilidad, integridad de datos y control de inventario.
 
 ---
 
-## 2. Alcance del modelo
+## 2. Correcciones aplicadas según el comentario recibido
+
+De acuerdo con la observación realizada, se revisó especialmente la relación entre las entidades `detalle_donacion`, `productos`, `detalle_entrega` y `entregas`. En la versión anterior existía riesgo de ambigüedad porque `detalle_entrega` se relacionaba directamente con `productos`, mientras que los productos también se registraban desde `detalle_donacion`. Esto podía generar un ciclo de interpretación y dificultar saber de qué donación o lote salía realmente el producto entregado.
+
+Para corregirlo se aplicaron los siguientes ajustes:
+
+1. Los atributos generales y comunes del producto, como nombre, categoría, unidad de medida y estado, quedan únicamente en la entidad fuerte `productos`.
+2. Los datos propios de la recepción del alimento, como cantidad recibida, cantidad disponible y fecha de vencimiento del lote, quedan en `detalle_donacion`, porque corresponden al producto recibido en una donación específica.
+3. La tabla `detalle_entrega` ya no se relaciona directamente con `productos`; ahora se relaciona con `detalle_donacion`. De esta forma se conoce exactamente de qué lote o detalle recibido sale cada producto entregado.
+4. Se elimina el ciclo cerrado ambiguo `productos -> detalle_donacion -> detalle_entrega -> productos`.
+5. La dirección de lectura del modelo queda clara: primero se recibe una donación, luego se registran sus productos en `detalle_donacion`, y finalmente las entregas descuentan cantidades desde esos detalles recibidos.
+
+Con este cambio, el modelo conserva la trazabilidad completa: **Donante -> Donación -> Detalle de donación/lote recibido -> Detalle de entrega -> Entrega -> Beneficiario**.
+
+---
+
+## 3. Alcance del modelo
 
 El modelo de base de datos cubre los siguientes procesos:
 
 1. Registro de donantes.
 2. Registro de beneficiarios.
 3. Registro de categorías de productos.
-4. Registro de productos alimenticios.
+4. Registro maestro de productos alimenticios.
 5. Registro de donaciones recibidas.
-6. Registro del detalle de productos incluidos en cada donación.
-7. Registro de entregas realizadas a beneficiarios.
-8. Registro del detalle de productos entregados.
-9. Control básico de inventario mediante cantidades disponibles.
+6. Registro del detalle de productos recibidos en cada donación.
+7. Control de inventario por detalle o lote recibido.
+8. Registro de entregas realizadas a beneficiarios.
+9. Registro del detalle de productos entregados, asociado al detalle recibido.
 10. Generación de consultas y reportes básicos.
 
 Quedan fuera del alcance procesos como facturación, contabilidad, transporte, aplicaciones móviles o interfaces gráficas.
 
 ---
 
-## 3. Identificación de entidades principales
+## 4. Identificación de entidades principales
 
-De acuerdo con la problemática y la solución propuesta, se identifican las siguientes entidades principales:
-
-| Entidad | Descripción |
-|---|---|
-| Donante | Persona, empresa o fundación que realiza una donación. |
-| Beneficiario | Persona o familia que recibe alimentos. |
-| CategoriaProducto | Clasificación de los alimentos, por ejemplo granos, lácteos, enlatados o frutas. |
-| Producto | Alimento registrado en el sistema. |
-| Donacion | Registro general de una donación recibida. |
-| DetalleDonacion | Productos y cantidades asociados a una donación. |
-| Entrega | Registro general de una entrega realizada a un beneficiario. |
-| DetalleEntrega | Productos y cantidades entregados en una entrega. |
+| Entidad | Tipo de entidad | Descripción |
+|---|---|---|
+| Donante | Fuerte | Persona, empresa o fundación que realiza una donación. |
+| Beneficiario | Fuerte | Persona o familia que recibe alimentos. |
+| CategoriaProducto | Fuerte | Clasificación de los alimentos, por ejemplo granos, lácteos, enlatados o frutas. |
+| Producto | Fuerte | Catálogo maestro de alimentos registrados en el sistema. |
+| Donacion | Fuerte | Registro general de una donación recibida. |
+| DetalleDonacion | Asociativa / detalle | Productos, cantidades y lote recibido dentro de una donación. |
+| Entrega | Fuerte | Registro general de una entrega realizada a un beneficiario. |
+| DetalleEntrega | Asociativa / detalle | Cantidades entregadas, asociadas al detalle de donación del cual salen los productos. |
 
 ---
 
-## 4. Modelo relacional propuesto
+## 5. Modelo relacional corregido
 
-### 4.1 Tabla: `donantes`
+### 5.1 Tabla: `donantes`
 
 Esta tabla almacena la información de las personas, empresas o fundaciones que realizan donaciones.
 
@@ -71,14 +86,14 @@ Esta tabla almacena la información de las personas, empresas o fundaciones que 
 
 ---
 
-### 4.2 Tabla: `beneficiarios`
+### 5.2 Tabla: `beneficiarios`
 
 Esta tabla almacena la información de las personas o familias beneficiarias.
 
 | Campo | Tipo de dato | Llave | Descripción |
 |---|---|---|---|
 | id_beneficiario | INT | PK | Identificador único del beneficiario. |
-| tipo_beneficiario | VARCHAR(30) |  | Persona o familia. |
+| tipo_beneficiario | VARCHAR(30) |  | Tipo de beneficiario: persona o familia. |
 | nombre | VARCHAR(100) |  | Nombre del beneficiario o responsable familiar. |
 | documento | VARCHAR(30) | UNIQUE | Documento de identificación. |
 | telefono | VARCHAR(20) |  | Número de contacto. |
@@ -93,7 +108,7 @@ Esta tabla almacena la información de las personas o familias beneficiarias.
 
 ---
 
-### 4.3 Tabla: `categorias_producto`
+### 5.3 Tabla: `categorias_producto`
 
 Esta tabla permite clasificar los productos alimenticios.
 
@@ -109,9 +124,9 @@ Esta tabla permite clasificar los productos alimenticios.
 
 ---
 
-### 4.4 Tabla: `productos`
+### 5.4 Tabla: `productos`
 
-Esta tabla contiene los alimentos que pueden ser donados o entregados.
+Esta tabla funciona como catálogo maestro de productos. Aquí solo se almacenan los atributos generales del alimento. No se guarda la cantidad disponible ni la fecha de vencimiento en esta tabla, porque esos datos cambian según cada donación o lote recibido.
 
 | Campo | Tipo de dato | Llave | Descripción |
 |---|---|---|---|
@@ -119,16 +134,14 @@ Esta tabla contiene los alimentos que pueden ser donados o entregados.
 | id_categoria | INT | FK | Categoría a la que pertenece el producto. |
 | nombre_producto | VARCHAR(100) |  | Nombre del alimento. |
 | unidad_medida | VARCHAR(30) |  | Unidad de medida: kg, unidad, litro, paquete, caja. |
-| cantidad_disponible | DECIMAL(10,2) |  | Cantidad actual disponible en inventario. |
-| fecha_vencimiento | DATE |  | Fecha de vencimiento del producto, si aplica. |
-| estado | VARCHAR(20) |  | Estado: disponible, agotado, vencido o inactivo. |
+| estado | VARCHAR(20) |  | Estado general del producto: activo o inactivo. |
 
 **Llave primaria:** `id_producto`  
 **Llave foránea:** `id_categoria` referencia a `categorias_producto(id_categoria)`
 
 ---
 
-### 4.5 Tabla: `donaciones`
+### 5.5 Tabla: `donaciones`
 
 Esta tabla registra la información general de cada donación recibida.
 
@@ -145,17 +158,19 @@ Esta tabla registra la información general de cada donación recibida.
 
 ---
 
-### 4.6 Tabla: `detalle_donacion`
+### 5.6 Tabla: `detalle_donacion`
 
-Esta tabla representa el detalle de productos incluidos en cada donación.
+Esta tabla representa los productos recibidos en cada donación. También funciona como control de lote, ya que guarda la cantidad recibida, la cantidad disponible y la fecha de vencimiento correspondiente a ese ingreso específico.
 
 | Campo | Tipo de dato | Llave | Descripción |
 |---|---|---|---|
-| id_detalle_donacion | INT | PK | Identificador único del detalle. |
+| id_detalle_donacion | INT | PK | Identificador único del detalle o lote recibido. |
 | id_donacion | INT | FK | Donación asociada. |
-| id_producto | INT | FK | Producto donado. |
-| cantidad | DECIMAL(10,2) |  | Cantidad donada. |
-| fecha_vencimiento_lote | DATE |  | Fecha de vencimiento del lote recibido. |
+| id_producto | INT | FK | Producto recibido. |
+| cantidad_recibida | DECIMAL(10,2) |  | Cantidad recibida en la donación. |
+| cantidad_disponible | DECIMAL(10,2) |  | Cantidad disponible de ese detalle o lote. |
+| fecha_vencimiento_lote | DATE |  | Fecha de vencimiento del lote recibido, si aplica. |
+| estado | VARCHAR(30) |  | Estado del lote: disponible, agotado, vencido o anulado. |
 | observaciones | VARCHAR(200) |  | Observaciones del producto recibido. |
 
 **Llave primaria:** `id_detalle_donacion`  
@@ -166,7 +181,7 @@ Esta tabla representa el detalle de productos incluidos en cada donación.
 
 ---
 
-### 4.7 Tabla: `entregas`
+### 5.7 Tabla: `entregas`
 
 Esta tabla registra la información general de cada entrega realizada a un beneficiario.
 
@@ -184,55 +199,142 @@ Esta tabla registra la información general de cada entrega realizada a un benef
 
 ---
 
-### 4.8 Tabla: `detalle_entrega`
+### 5.8 Tabla: `detalle_entrega`
 
-Esta tabla almacena los productos entregados en cada entrega.
+Esta tabla almacena las cantidades entregadas en cada entrega. Para evitar ambigüedad, no se relaciona directamente con `productos`, sino con `detalle_donacion`, porque allí está el producto recibido y el lote del cual se descuenta la cantidad entregada.
 
 | Campo | Tipo de dato | Llave | Descripción |
 |---|---|---|---|
-| id_detalle_entrega | INT | PK | Identificador único del detalle. |
+| id_detalle_entrega | INT | PK | Identificador único del detalle de entrega. |
 | id_entrega | INT | FK | Entrega asociada. |
-| id_producto | INT | FK | Producto entregado. |
-| cantidad | DECIMAL(10,2) |  | Cantidad entregada. |
+| id_detalle_donacion | INT | FK | Detalle de donación o lote del cual sale el producto entregado. |
+| cantidad_entregada | DECIMAL(10,2) |  | Cantidad entregada al beneficiario. |
 | observaciones | VARCHAR(200) |  | Comentarios del producto entregado. |
 
 **Llave primaria:** `id_detalle_entrega`  
 **Llaves foráneas:**
 
 - `id_entrega` referencia a `entregas(id_entrega)`.
-- `id_producto` referencia a `productos(id_producto)`.
+- `id_detalle_donacion` referencia a `detalle_donacion(id_detalle_donacion)`.
 
 ---
 
-## 5. Relaciones y cardinalidades
+## 6. Relaciones y cardinalidades corregidas
 
 | Relación | Cardinalidad | Explicación |
 |---|---|---|
 | Donante - Donación | 1:N | Un donante puede realizar muchas donaciones, pero cada donación pertenece a un solo donante. |
-| Donación - DetalleDonación | 1:N | Una donación puede contener varios productos, pero cada detalle pertenece a una sola donación. |
-| Producto - DetalleDonación | 1:N | Un producto puede aparecer en muchas donaciones, pero cada detalle registra un solo producto. |
+| Donación - DetalleDonación | 1:N | Una donación puede contener varios productos o lotes recibidos, pero cada detalle pertenece a una sola donación. |
+| Producto - DetalleDonación | 1:N | Un producto puede recibirse muchas veces en distintas donaciones, pero cada detalle registra un solo producto. |
 | CategoríaProducto - Producto | 1:N | Una categoría puede tener muchos productos, pero cada producto pertenece a una sola categoría. |
 | Beneficiario - Entrega | 1:N | Un beneficiario puede recibir muchas entregas, pero cada entrega pertenece a un solo beneficiario. |
-| Entrega - DetalleEntrega | 1:N | Una entrega puede contener varios productos, pero cada detalle pertenece a una sola entrega. |
-| Producto - DetalleEntrega | 1:N | Un producto puede aparecer en muchas entregas, pero cada detalle registra un solo producto. |
+| Entrega - DetalleEntrega | 1:N | Una entrega puede contener varios productos entregados, pero cada detalle pertenece a una sola entrega. |
+| DetalleDonación - DetalleEntrega | 1:N | Un detalle de donación puede ser entregado en varias entregas parciales, pero cada detalle de entrega descuenta de un solo detalle recibido. |
+
+Con esta estructura se evita la relación circular directa entre `productos`, `detalle_donacion` y `detalle_entrega`. El producto entregado se obtiene a través de `detalle_donacion`, lo cual permite identificar el lote, la donación de origen y el producto sin duplicar relaciones.
 
 ---
 
-## 6. Diagrama lógico en texto
-## 6. Diagrama lógico
+## 7. Diagrama lógico corregido
 
-El siguiente diagrama representa las relaciones principales entre las tablas del sistema, incluyendo llaves primarias, llaves foráneas y cardinalidades.
+El siguiente diagrama representa la dirección correcta de las relaciones. Se observa que `detalle_entrega` apunta hacia `detalle_donacion` y no directamente hacia `productos`, evitando ambigüedad en la trazabilidad.
 
-![Diagrama lógico relacional del sistema de donación de alimentos](img/diagrama_logico_donaciones.png)
+```mermaid
+erDiagram
+    DONANTES ||--o{ DONACIONES : realiza
+    DONACIONES ||--o{ DETALLE_DONACION : contiene
+    CATEGORIAS_PRODUCTO ||--o{ PRODUCTOS : clasifica
+    PRODUCTOS ||--o{ DETALLE_DONACION : se_recibe_en
+    BENEFICIARIOS ||--o{ ENTREGAS : recibe
+    ENTREGAS ||--o{ DETALLE_ENTREGA : contiene
+    DETALLE_DONACION ||--o{ DETALLE_ENTREGA : se_descuenta_en
+
+    DONANTES {
+        int id_donante PK
+        varchar tipo_donante
+        varchar nombre
+        varchar documento UK
+        varchar telefono
+        varchar correo
+        varchar direccion
+        date fecha_registro
+        varchar estado
+    }
+
+    BENEFICIARIOS {
+        int id_beneficiario PK
+        varchar tipo_beneficiario
+        varchar nombre
+        varchar documento UK
+        varchar telefono
+        varchar direccion
+        int numero_integrantes
+        varchar condicion_vulnerabilidad
+        date fecha_registro
+        varchar estado
+    }
+
+    CATEGORIAS_PRODUCTO {
+        int id_categoria PK
+        varchar nombre_categoria UK
+        varchar descripcion
+        varchar estado
+    }
+
+    PRODUCTOS {
+        int id_producto PK
+        int id_categoria FK
+        varchar nombre_producto
+        varchar unidad_medida
+        varchar estado
+    }
+
+    DONACIONES {
+        int id_donacion PK
+        int id_donante FK
+        date fecha_donacion
+        varchar estado
+        text observaciones
+    }
+
+    DETALLE_DONACION {
+        int id_detalle_donacion PK
+        int id_donacion FK
+        int id_producto FK
+        decimal cantidad_recibida
+        decimal cantidad_disponible
+        date fecha_vencimiento_lote
+        varchar estado
+        varchar observaciones
+    }
+
+    ENTREGAS {
+        int id_entrega PK
+        int id_beneficiario FK
+        date fecha_entrega
+        varchar responsable_entrega
+        varchar estado
+        text observaciones
+    }
+
+    DETALLE_ENTREGA {
+        int id_detalle_entrega PK
+        int id_entrega FK
+        int id_detalle_donacion FK
+        decimal cantidad_entregada
+        varchar observaciones
+    }
+```
+
 ---
 
-## 7. Normalización del modelo
+## 8. Normalización del modelo
 
 La normalización permite organizar los datos para evitar duplicidad, inconsistencias y problemas de actualización. Para este modelo se aplican la Primera Forma Normal, Segunda Forma Normal y Tercera Forma Normal.
 
 ---
 
-### 7.1 Primera Forma Normal, 1FN
+### 8.1 Primera Forma Normal, 1FN
 
 Una tabla cumple la Primera Forma Normal cuando:
 
@@ -255,7 +357,7 @@ Este diseño no cumple 1FN porque los campos `productos` y `cantidades` contiene
 
 Se separa la información en registros individuales mediante una tabla de detalle:
 
-| id_donacion | id_producto | cantidad |
+| id_donacion | id_producto | cantidad_recibida |
 |---|---|---|
 | 1 | 1 | 10 |
 | 1 | 2 | 5 |
@@ -265,7 +367,7 @@ De esta forma, cada celda contiene un solo dato y cada producto donado queda reg
 
 ---
 
-### 7.2 Segunda Forma Normal, 2FN
+### 8.2 Segunda Forma Normal, 2FN
 
 Una tabla cumple la Segunda Forma Normal cuando:
 
@@ -275,20 +377,20 @@ Una tabla cumple la Segunda Forma Normal cuando:
 
 #### Problema antes de aplicar 2FN
 
-Si en la tabla `detalle_donacion` se guardara también el nombre del producto y la categoría, se tendría repetición innecesaria:
+Si en la tabla `detalle_donacion` se guardara también el nombre del producto, la unidad de medida y la categoría, se tendría repetición innecesaria:
 
-| id_donacion | id_producto | nombre_producto | categoria | cantidad |
-|---|---|---|---|---|
-| 1 | 1 | Arroz | Granos | 10 |
-| 2 | 1 | Arroz | Granos | 20 |
+| id_donacion | id_producto | nombre_producto | unidad_medida | categoria | cantidad_recibida |
+|---|---|---|---|---|---|
+| 1 | 1 | Arroz | kg | Granos | 10 |
+| 2 | 1 | Arroz | kg | Granos | 20 |
 
-El `nombre_producto` y la `categoria` dependen del producto, no de la donación. Por eso no deben repetirse en cada detalle.
+El `nombre_producto`, la `unidad_medida` y la `categoria` dependen del producto, no de la donación. Por eso no deben repetirse en cada detalle.
 
 #### Solución aplicando 2FN
 
 Se separa la información del producto en la tabla `productos` y la información de categoría en `categorias_producto`.
 
-- `detalle_donacion` guarda únicamente la relación entre donación, producto y cantidad.
+- `detalle_donacion` guarda únicamente la relación entre donación, producto, cantidades y datos del lote recibido.
 - `productos` guarda los datos propios del alimento.
 - `categorias_producto` guarda los datos propios de la categoría.
 
@@ -296,7 +398,7 @@ Esto evita duplicidad y mejora la integridad de los datos.
 
 ---
 
-### 7.3 Tercera Forma Normal, 3FN
+### 8.3 Tercera Forma Normal, 3FN
 
 Una tabla cumple la Tercera Forma Normal cuando:
 
@@ -325,9 +427,11 @@ Con esto:
 - Los productos se relacionan con la categoría mediante una llave foránea.
 - Se evitan inconsistencias al modificar nombres o descripciones de categorías.
 
+También se evita guardar `id_producto` directamente en `detalle_entrega`, porque ese dato se obtiene mediante `detalle_donacion`. De esta manera, `detalle_entrega` no repite información que ya está asociada al lote recibido.
+
 ---
 
-## 8. Modelo final normalizado
+## 9. Modelo final normalizado
 
 El modelo final queda distribuido en las siguientes tablas:
 
@@ -340,11 +444,11 @@ El modelo final queda distribuido en las siguientes tablas:
 7. `entregas`
 8. `detalle_entrega`
 
-Este diseño permite separar correctamente la información, evitar duplicidad, mantener trazabilidad y consultar los datos de forma eficiente.
+La diferencia principal frente al modelo anterior es que `detalle_entrega` se conecta con `detalle_donacion`, no directamente con `productos`. Esto permite saber exactamente de qué detalle recibido se toma el alimento entregado.
 
 ---
 
-## 9. Script SQL de creación de tablas
+## 10. Script SQL de creación de tablas corregido
 
 El siguiente script está planteado para MySQL o MariaDB.
 
@@ -389,9 +493,7 @@ CREATE TABLE productos (
     id_categoria INT NOT NULL,
     nombre_producto VARCHAR(100) NOT NULL,
     unidad_medida VARCHAR(30) NOT NULL,
-    cantidad_disponible DECIMAL(10,2) NOT NULL DEFAULT 0,
-    fecha_vencimiento DATE,
-    estado VARCHAR(20) NOT NULL DEFAULT 'disponible',
+    estado VARCHAR(20) NOT NULL DEFAULT 'activo',
     CONSTRAINT fk_productos_categoria
         FOREIGN KEY (id_categoria)
         REFERENCES categorias_producto(id_categoria)
@@ -412,15 +514,23 @@ CREATE TABLE detalle_donacion (
     id_detalle_donacion INT AUTO_INCREMENT PRIMARY KEY,
     id_donacion INT NOT NULL,
     id_producto INT NOT NULL,
-    cantidad DECIMAL(10,2) NOT NULL,
+    cantidad_recibida DECIMAL(10,2) NOT NULL,
+    cantidad_disponible DECIMAL(10,2) NOT NULL,
     fecha_vencimiento_lote DATE,
+    estado VARCHAR(30) NOT NULL DEFAULT 'disponible',
     observaciones VARCHAR(200),
     CONSTRAINT fk_detalle_donacion_donacion
         FOREIGN KEY (id_donacion)
         REFERENCES donaciones(id_donacion),
     CONSTRAINT fk_detalle_donacion_producto
         FOREIGN KEY (id_producto)
-        REFERENCES productos(id_producto)
+        REFERENCES productos(id_producto),
+    CONSTRAINT chk_detalle_donacion_cantidad_recibida
+        CHECK (cantidad_recibida > 0),
+    CONSTRAINT chk_detalle_donacion_cantidad_disponible
+        CHECK (cantidad_disponible >= 0),
+    CONSTRAINT chk_detalle_donacion_disponible_menor_recibida
+        CHECK (cantidad_disponible <= cantidad_recibida)
 );
 
 CREATE TABLE entregas (
@@ -438,21 +548,25 @@ CREATE TABLE entregas (
 CREATE TABLE detalle_entrega (
     id_detalle_entrega INT AUTO_INCREMENT PRIMARY KEY,
     id_entrega INT NOT NULL,
-    id_producto INT NOT NULL,
-    cantidad DECIMAL(10,2) NOT NULL,
+    id_detalle_donacion INT NOT NULL,
+    cantidad_entregada DECIMAL(10,2) NOT NULL,
     observaciones VARCHAR(200),
     CONSTRAINT fk_detalle_entrega_entrega
         FOREIGN KEY (id_entrega)
         REFERENCES entregas(id_entrega),
-    CONSTRAINT fk_detalle_entrega_producto
-        FOREIGN KEY (id_producto)
-        REFERENCES productos(id_producto)
+    CONSTRAINT fk_detalle_entrega_detalle_donacion
+        FOREIGN KEY (id_detalle_donacion)
+        REFERENCES detalle_donacion(id_detalle_donacion),
+    CONSTRAINT chk_detalle_entrega_cantidad
+        CHECK (cantidad_entregada > 0)
 );
 ```
 
+> Nota: La validación de no entregar una cantidad mayor a la disponible puede reforzarse con procedimientos almacenados, transacciones o validación desde la aplicación, ya que requiere comparar el valor entregado contra el inventario disponible antes de actualizarlo.
+
 ---
 
-## 10. Pasos para desarrollar la base de datos
+## 11. Pasos para desarrollar la base de datos
 
 ### Paso 1. Analizar la problemática
 
@@ -473,7 +587,7 @@ Se identifican los elementos principales del sistema:
 
 ### Paso 3. Definir atributos
 
-A cada entidad se le asignan campos necesarios para almacenar su información. Por ejemplo, un donante necesita nombre, documento, teléfono, correo y dirección.
+A cada entidad se le asignan los campos necesarios para almacenar su información. Los atributos comunes se ubican en las entidades fuertes. Por ejemplo, el nombre y la unidad de medida del alimento quedan en `productos`, mientras que la cantidad disponible y fecha de vencimiento quedan en `detalle_donacion`, porque dependen del lote recibido.
 
 ### Paso 4. Definir llaves primarias
 
@@ -482,7 +596,9 @@ Cada tabla debe tener una llave primaria que identifique de forma única cada re
 - `id_donante`
 - `id_producto`
 - `id_donacion`
+- `id_detalle_donacion`
 - `id_entrega`
+- `id_detalle_entrega`
 
 ### Paso 5. Definir llaves foráneas
 
@@ -491,7 +607,8 @@ Las llaves foráneas permiten relacionar las tablas entre sí. Ejemplos:
 - `donaciones.id_donante` se relaciona con `donantes.id_donante`.
 - `productos.id_categoria` se relaciona con `categorias_producto.id_categoria`.
 - `detalle_donacion.id_producto` se relaciona con `productos.id_producto`.
-- `detalle_entrega.id_entrega` se relaciona con `entregas.id_entrega`.
+- `detalle_entrega.id_detalle_donacion` se relaciona con `detalle_donacion.id_detalle_donacion`.
+- `entregas.id_beneficiario` se relaciona con `beneficiarios.id_beneficiario`.
 
 ### Paso 6. Establecer cardinalidades
 
@@ -499,7 +616,7 @@ Se analiza cuántos registros de una tabla pueden relacionarse con otra. Por eje
 
 ### Paso 7. Aplicar normalización
 
-Se aplica 1FN, 2FN y 3FN para evitar datos repetidos, campos multivalor y dependencias incorrectas.
+Se aplica 1FN, 2FN y 3FN para evitar datos repetidos, campos multivalor, dependencias incorrectas y relaciones ambiguas.
 
 ### Paso 8. Crear el script SQL
 
@@ -515,7 +632,7 @@ Se realizan consultas para comprobar donaciones, inventario, entregas y benefici
 
 ---
 
-## 11. Datos de prueba
+## 12. Datos de prueba corregidos
 
 ```sql
 INSERT INTO categorias_producto (nombre_categoria, descripcion)
@@ -535,64 +652,73 @@ VALUES
 ('Familia', 'Familia Rodriguez', '20202020', '3203334455', 'Barrio Esperanza', 4, 'Bajos recursos', CURDATE()),
 ('Persona', 'Maria Gomez', '30303030', '3154445566', 'Barrio La Paz', 1, 'Adulto mayor', CURDATE());
 
-INSERT INTO productos (id_categoria, nombre_producto, unidad_medida, cantidad_disponible, fecha_vencimiento)
+INSERT INTO productos (id_categoria, nombre_producto, unidad_medida)
 VALUES
-(1, 'Arroz', 'kg', 0, '2026-12-31'),
-(1, 'Frijol', 'kg', 0, '2026-11-30'),
-(2, 'Atun en lata', 'unidad', 0, '2027-03-15'),
-(4, 'Aceite', 'litro', 0, '2026-10-20');
+(1, 'Arroz', 'kg'),
+(1, 'Frijol', 'kg'),
+(2, 'Atun en lata', 'unidad'),
+(4, 'Aceite', 'litro');
 
 INSERT INTO donaciones (id_donante, fecha_donacion, estado, observaciones)
 VALUES
 (1, CURDATE(), 'recibida', 'Donacion inicial de alimentos no perecederos');
 
-INSERT INTO detalle_donacion (id_donacion, id_producto, cantidad, fecha_vencimiento_lote)
+INSERT INTO detalle_donacion
+(id_donacion, id_producto, cantidad_recibida, cantidad_disponible, fecha_vencimiento_lote, estado)
 VALUES
-(1, 1, 50, '2026-12-31'),
-(1, 2, 30, '2026-11-30'),
-(1, 3, 40, '2027-03-15');
-
-UPDATE productos SET cantidad_disponible = cantidad_disponible + 50 WHERE id_producto = 1;
-UPDATE productos SET cantidad_disponible = cantidad_disponible + 30 WHERE id_producto = 2;
-UPDATE productos SET cantidad_disponible = cantidad_disponible + 40 WHERE id_producto = 3;
+(1, 1, 50, 50, '2026-12-31', 'disponible'),
+(1, 2, 30, 30, '2026-11-30', 'disponible'),
+(1, 3, 40, 40, '2027-03-15', 'disponible');
 
 INSERT INTO entregas (id_beneficiario, fecha_entrega, responsable_entrega, estado, observaciones)
 VALUES
 (1, CURDATE(), 'Coordinador de entregas', 'entregada', 'Entrega de mercado familiar');
 
-INSERT INTO detalle_entrega (id_entrega, id_producto, cantidad)
+INSERT INTO detalle_entrega (id_entrega, id_detalle_donacion, cantidad_entregada)
 VALUES
 (1, 1, 5),
 (1, 2, 3),
 (1, 3, 4);
 
-UPDATE productos SET cantidad_disponible = cantidad_disponible - 5 WHERE id_producto = 1;
-UPDATE productos SET cantidad_disponible = cantidad_disponible - 3 WHERE id_producto = 2;
-UPDATE productos SET cantidad_disponible = cantidad_disponible - 4 WHERE id_producto = 3;
+UPDATE detalle_donacion
+SET cantidad_disponible = cantidad_disponible - 5
+WHERE id_detalle_donacion = 1;
+
+UPDATE detalle_donacion
+SET cantidad_disponible = cantidad_disponible - 3
+WHERE id_detalle_donacion = 2;
+
+UPDATE detalle_donacion
+SET cantidad_disponible = cantidad_disponible - 4
+WHERE id_detalle_donacion = 3;
 ```
 
 ---
 
-## 12. Consultas de reporte
+## 13. Consultas de reporte corregidas
 
-### 12.1 Consultar inventario disponible
+### 13.1 Consultar inventario disponible por lote recibido
 
 ```sql
 SELECT
-    p.id_producto,
+    dd.id_detalle_donacion,
     p.nombre_producto,
     c.nombre_categoria,
     p.unidad_medida,
-    p.cantidad_disponible,
-    p.fecha_vencimiento,
-    p.estado
-FROM productos p
+    dd.cantidad_recibida,
+    dd.cantidad_disponible,
+    dd.fecha_vencimiento_lote,
+    dd.estado
+FROM detalle_donacion dd
+INNER JOIN productos p
+    ON dd.id_producto = p.id_producto
 INNER JOIN categorias_producto c
     ON p.id_categoria = c.id_categoria
-ORDER BY p.nombre_producto;
+WHERE dd.cantidad_disponible > 0
+ORDER BY dd.fecha_vencimiento_lote ASC, p.nombre_producto ASC;
 ```
 
-### 12.2 Consultar donaciones realizadas por donante
+### 13.2 Consultar donaciones realizadas por donante
 
 ```sql
 SELECT
@@ -608,14 +734,16 @@ INNER JOIN donantes do
 ORDER BY d.fecha_donacion DESC;
 ```
 
-### 12.3 Consultar detalle de una donación
+### 13.3 Consultar detalle de una donación
 
 ```sql
 SELECT
     d.id_donacion,
     do.nombre AS donante,
     p.nombre_producto,
-    dd.cantidad,
+    c.nombre_categoria,
+    dd.cantidad_recibida,
+    dd.cantidad_disponible,
     p.unidad_medida,
     dd.fecha_vencimiento_lote
 FROM detalle_donacion dd
@@ -625,10 +753,12 @@ INNER JOIN donantes do
     ON d.id_donante = do.id_donante
 INNER JOIN productos p
     ON dd.id_producto = p.id_producto
+INNER JOIN categorias_producto c
+    ON p.id_categoria = c.id_categoria
 WHERE d.id_donacion = 1;
 ```
 
-### 12.4 Consultar beneficiarios atendidos
+### 13.4 Consultar beneficiarios atendidos
 
 ```sql
 SELECT
@@ -644,31 +774,37 @@ INNER JOIN beneficiarios b
 ORDER BY e.fecha_entrega DESC;
 ```
 
-### 12.5 Consultar productos entregados a un beneficiario
+### 13.5 Consultar productos entregados a un beneficiario
 
 ```sql
 SELECT
     b.nombre AS beneficiario,
     e.fecha_entrega,
     p.nombre_producto,
-    de.cantidad,
-    p.unidad_medida
+    de.cantidad_entregada,
+    p.unidad_medida,
+    dd.fecha_vencimiento_lote,
+    d.id_donacion
 FROM detalle_entrega de
 INNER JOIN entregas e
     ON de.id_entrega = e.id_entrega
 INNER JOIN beneficiarios b
     ON e.id_beneficiario = b.id_beneficiario
+INNER JOIN detalle_donacion dd
+    ON de.id_detalle_donacion = dd.id_detalle_donacion
 INNER JOIN productos p
-    ON de.id_producto = p.id_producto
+    ON dd.id_producto = p.id_producto
+INNER JOIN donaciones d
+    ON dd.id_donacion = d.id_donacion
 WHERE b.id_beneficiario = 1;
 ```
 
-### 12.6 Consultar productos más donados
+### 13.6 Consultar productos más donados
 
 ```sql
 SELECT
     p.nombre_producto,
-    SUM(dd.cantidad) AS total_donado,
+    SUM(dd.cantidad_recibida) AS total_donado,
     p.unidad_medida
 FROM detalle_donacion dd
 INNER JOIN productos p
@@ -677,22 +813,23 @@ GROUP BY p.id_producto, p.nombre_producto, p.unidad_medida
 ORDER BY total_donado DESC;
 ```
 
-### 12.7 Consultar productos más entregados
+### 13.7 Consultar productos más entregados
 
 ```sql
 SELECT
     p.nombre_producto,
-    SUM(de.cantidad) AS total_entregado,
+    SUM(de.cantidad_entregada) AS total_entregado,
     p.unidad_medida
 FROM detalle_entrega de
+INNER JOIN detalle_donacion dd
+    ON de.id_detalle_donacion = dd.id_detalle_donacion
 INNER JOIN productos p
-    ON de.id_producto = p.id_producto
+    ON dd.id_producto = p.id_producto
 GROUP BY p.id_producto, p.nombre_producto, p.unidad_medida
 ORDER BY total_entregado DESC;
 ```
 
-
-### 12.8 Consultar donaciones recibidas por rango de fechas
+### 13.8 Consultar donaciones recibidas por rango de fechas
 
 Esta consulta permite conocer las donaciones recibidas dentro de un período específico. Es útil para generar reportes mensuales, semanales o anuales.
 
@@ -703,7 +840,7 @@ SELECT
     do.tipo_donante,
     d.fecha_donacion,
     d.estado,
-    SUM(dd.cantidad) AS total_productos_recibidos
+    SUM(dd.cantidad_recibida) AS total_productos_recibidos
 FROM donaciones d
 INNER JOIN donantes do
     ON d.id_donante = do.id_donante
@@ -719,29 +856,31 @@ GROUP BY
 ORDER BY d.fecha_donacion DESC;
 ```
 
-### 12.9 Consultar productos próximos a vencer
+### 13.9 Consultar productos próximos a vencer
 
 Esta consulta ayuda a identificar los productos que tienen fecha de vencimiento cercana, con el fin de priorizar su entrega y evitar pérdidas.
 
 ```sql
 SELECT
-    p.id_producto,
+    dd.id_detalle_donacion,
     p.nombre_producto,
     c.nombre_categoria,
-    p.cantidad_disponible,
+    dd.cantidad_disponible,
     p.unidad_medida,
-    p.fecha_vencimiento,
-    DATEDIFF(p.fecha_vencimiento, CURDATE()) AS dias_para_vencer
-FROM productos p
+    dd.fecha_vencimiento_lote,
+    DATEDIFF(dd.fecha_vencimiento_lote, CURDATE()) AS dias_para_vencer
+FROM detalle_donacion dd
+INNER JOIN productos p
+    ON dd.id_producto = p.id_producto
 INNER JOIN categorias_producto c
     ON p.id_categoria = c.id_categoria
-WHERE p.fecha_vencimiento IS NOT NULL
-  AND p.fecha_vencimiento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-  AND p.cantidad_disponible > 0
-ORDER BY p.fecha_vencimiento ASC;
+WHERE dd.fecha_vencimiento_lote IS NOT NULL
+  AND dd.fecha_vencimiento_lote BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+  AND dd.cantidad_disponible > 0
+ORDER BY dd.fecha_vencimiento_lote ASC;
 ```
 
-### 12.10 Consultar cantidad de entregas por beneficiario
+### 13.10 Consultar cantidad de entregas por beneficiario
 
 Esta consulta permite saber cuántas entregas ha recibido cada beneficiario y la fecha de su última atención.
 
@@ -766,7 +905,7 @@ ORDER BY total_entregas_recibidas DESC;
 
 ---
 
-## 13. Reglas de integridad recomendadas
+## 14. Reglas de integridad recomendadas
 
 Para garantizar el correcto funcionamiento de la base de datos, se recomiendan las siguientes reglas:
 
@@ -775,19 +914,21 @@ Para garantizar el correcto funcionamiento de la base de datos, se recomiendan l
 3. Una donación no puede existir sin un donante.
 4. Una entrega no puede existir sin un beneficiario.
 5. Un detalle de donación no puede existir sin una donación y un producto.
-6. Un detalle de entrega no puede existir sin una entrega y un producto.
-7. La cantidad donada debe ser mayor que cero.
-8. La cantidad entregada debe ser mayor que cero.
-9. No se debe entregar una cantidad mayor a la disponible en inventario.
-10. Los productos vencidos no deberían entregarse.
-
+6. Un detalle de entrega no puede existir sin una entrega y sin un detalle de donación.
+7. La cantidad recibida debe ser mayor que cero.
+8. La cantidad disponible no puede ser negativa.
+9. La cantidad disponible no puede ser mayor que la cantidad recibida.
+10. La cantidad entregada debe ser mayor que cero.
+11. No se debe entregar una cantidad mayor a la disponible en el detalle de donación.
+12. Los productos vencidos no deberían entregarse.
+13. Si la cantidad disponible de un detalle de donación llega a cero, su estado puede cambiar a `agotado`.
 
 ---
 
-## 14. Conclusión
+## 15. Conclusión
 
-El modelo relacional propuesto permite organizar de forma clara y eficiente la información del Sistema de Gestión de Donación de Alimentos. Mediante las tablas `donantes`, `donaciones`, `productos`, `beneficiarios`, `entregas` y sus respectivos detalles, se logra una trazabilidad completa desde la recepción de los alimentos hasta su distribución final.
+El modelo relacional corregido permite organizar de forma clara y eficiente la información del Sistema de Gestión de Donación de Alimentos. La corrección principal consiste en evitar que `detalle_entrega` se relacione directamente con `productos`, ya que esa relación podía generar ambigüedad frente al origen real del alimento entregado.
+
+Con el ajuste realizado, la entrega se relaciona con `detalle_donacion`, permitiendo identificar el producto, la donación de origen, la cantidad recibida, la cantidad disponible y la fecha de vencimiento del lote. Así se mejora la trazabilidad y se evita un ciclo cerrado innecesario entre las tablas.
 
 Además, la aplicación de la normalización en 1FN, 2FN y 3FN permite reducir la duplicidad de datos, mejorar la integridad de la información y facilitar la generación de consultas y reportes para la toma de decisiones.
-
-Este diseño contribuye a que las organizaciones sociales puedan administrar mejor sus recursos, ofrecer mayor transparencia y asegurar que las ayudas lleguen de forma más eficiente a las comunidades que las necesitan.
