@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Gestión de Donación de Alimentos</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <script defer src="js/app.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">Panel operativo</p>
+            <h1>Sistema de Gestión de Donación de Alimentos</h1>
+        </div>
+        <span class="api-status" id="api-status">API: verificando</span>
+    </header>
+
+    <div class="layout">
+        <aside class="menu" aria-label="Navegación principal">
+            <nav>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#donantes">Donantes</a>
+                <a href="#beneficiarios">Beneficiarios</a>
+                <a href="#productos">Productos</a>
+                <a href="#entregas">Entregas</a>
+                <a href="#reportes">Reportes</a>
+            </nav>
+        </aside>
+
+        <main class="contenido">
+            <section class="dashboard" id="dashboard">
+                <div class="section-title">
+                    <p class="eyebrow">Resumen</p>
+                    <h2>Dashboard general</h2>
+                </div>
+
+                <div class="cards">
+                    <article class="card">
+                        <span>Donantes</span>
+                        <strong id="count-donantes">--</strong>
+                    </article>
+                    <article class="card">
+                        <span>Beneficiarios</span>
+                        <strong id="count-beneficiarios">--</strong>
+                    </article>
+                    <article class="card">
+                        <span>Productos</span>
+                        <strong id="count-productos">--</strong>
+                    </article>
+                    <article class="card">
+                        <span>Entregas</span>
+                        <strong id="count-entregas">--</strong>
+                    </article>
+                </div>
+            </section>
+
+            <section class="modulo" id="donantes">
+                <h2>Gestión de Donantes</h2>
+                <div class="formulario">
+                    <form>
+                        <label>Nombre completo</label>
+                        <input type="text" placeholder="Nombre del donante">
+
+                        <label>Tipo de donante</label>
+                        <input type="text" placeholder="Persona, Empresa o Fundación">
+
+                        <label>Teléfono</label>
+                        <input type="text" placeholder="Número de contacto">
+
+                        <label>Correo electrónico</label>
+                        <input type="email" placeholder="correo@ejemplo.com">
+
+                        <label>Dirección</label>
+                        <input type="text" placeholder="Ciudad o dirección">
+
+                        <button type="submit">Guardar donante</button>
+                    </form>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <h3>Lista de Donantes</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Teléfono</th>
+                                <th>Correo</th>
+                                <th>Dirección</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-donantes">
+                            <tr>
+                                <td colspan="6">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="modulo" id="beneficiarios">
+                <h2>Gestión de Beneficiarios</h2>
+                <div class="formulario">
+                    <form>
+                        <label>Nombre completo</label>
+                        <input type="text" placeholder="Nombre del beneficiario">
+
+                        <label>Documento</label>
+                        <input type="text" placeholder="Documento de identidad">
+
+                        <label>Teléfono</label>
+                        <input type="text" placeholder="Número de contacto">
+
+                        <label>Dirección</label>
+                        <input type="text" placeholder="Ciudad o dirección">
+
+                        <label>Número de integrantes</label>
+                        <input type="number" min="1" placeholder="Integrantes del hogar">
+
+                        <label>Condición</label>
+                        <input type="text" placeholder="Condición social">
+
+                        <button type="submit">Guardar beneficiario</button>
+                    </form>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <h3>Lista de Beneficiarios</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Documento</th>
+                                <th>Teléfono</th>
+                                <th>Condición</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-beneficiarios">
+                            <tr>
+                                <td colspan="6">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="modulo" id="productos">
+                <h2>Gestión de Productos</h2>
+                <div class="formulario">
+                    <form>
+                        <label>Nombre producto</label>
+                        <input type="text" placeholder="Nombre del producto">
+
+                        <label>Categoría</label>
+                        <input type="text" placeholder="Ej: Granos, Lácteos, Conservas">
+
+                        <label>Unidad de medida</label>
+                        <input type="text" placeholder="Kg, Litro, Unidad">
+
+                        <label>Fecha de vencimiento</label>
+                        <input type="date">
+
+                        <button type="submit">Guardar producto</button>
+                    </form>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <h3>Inventario de Productos</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Unidad</th>
+                                <th>Vencimiento</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos">
+                            <tr>
+                                <td colspan="6">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="modulo" id="entregas">
+                <h2>Gestión de Entregas</h2>
+                <div class="formulario">
+                    <form>
+                        <label>ID beneficiario</label>
+                        <input type="number" min="1" placeholder="Beneficiario asociado">
+
+                        <label>Fecha de entrega</label>
+                        <input type="date">
+
+                        <label>Responsable</label>
+                        <input type="text" placeholder="Responsable de la entrega">
+
+                        <label>Observación</label>
+                        <input type="text" placeholder="Detalle de la entrega">
+
+                        <button type="submit">Registrar entrega</button>
+                    </form>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <h3>Historial de Entregas</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ID beneficiario</th>
+                                <th>Fecha</th>
+                                <th>Responsable</th>
+                                <th>Observación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-entregas">
+                            <tr>
+                                <td colspan="6">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="modulo" id="reportes">
+                <h2>Reportes</h2>
+                <div class="tabla-contenedor">
+                    <p>Vista reservada para reportes de donaciones, beneficiarios atendidos y productos próximos a vencer.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

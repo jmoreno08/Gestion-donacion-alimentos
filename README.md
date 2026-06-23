@@ -108,6 +108,7 @@ Proyecto desarrollado en Java y MySQL.
 * Maven
 * Docker / Docker Compose
 * Postman
+* HTML, CSS y JavaScript
 
 ## Base de datos
 
@@ -213,6 +214,32 @@ Pasos:
 5. Ejecutar primero `Health` y luego las solicitudes CRUD.
 
 La coleccion incluye solicitudes para listar, consultar, crear, actualizar y eliminar registros de Donantes, Productos, Beneficiarios y Entregas.
+
+## Frontend estatico
+
+El proyecto incluye una interfaz inicial en:
+
+```text
+frontend/index.html
+```
+
+La estructura recomendada queda separada del backend Java:
+
+```text
+frontend/
+├── index.html
+├── css/
+│   └── estilos.css
+└── js/
+    └── app.js
+```
+
+Para usarla:
+
+1. Levantar el backend con `docker compose up -d --build`.
+2. Abrir `frontend/index.html` en el navegador.
+
+Por ahora los formularios son visuales. Las tablas y contadores cargan datos reales desde los endpoints `GET` del backend en `http://localhost:18080`.
 
 Para ejecutar la demo de consola manualmente:
 
@@ -383,6 +410,13 @@ sistema-donacion-alimentos/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── Gestion_Donacion_Alimentos_Postman_Collection.json
+│
+├── frontend/
+│   ├── index.html
+│   ├── css/
+│   │   └── estilos.css
+│   └── js/
+│       └── app.js
 │
 ├── docs/
 │   ├── problematica.md
