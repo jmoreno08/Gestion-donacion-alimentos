@@ -102,17 +102,189 @@ Proyecto desarrollado en Java y MySQL.
 
 ## Tecnologías
 
-* Java
+* Java 17
 * JDBC
 * MySQL
-* XAMPP
-* phpMyAdmin
+* Maven
+* Docker / Docker Compose
+* Postman
+* HTML, CSS y JavaScript
 
 ## Base de datos
 
 La base de datos se encuentra en el archivo:
 
 gestion_donacion_alimentos.sql
+
+## Ejecucion con Docker
+
+El proyecto puede ejecutarse en contenedores sin instalar Java, Maven, MySQL, XAMPP ni phpMyAdmin en el equipo.
+
+Requisitos:
+
+- Docker Desktop
+
+Comandos principales:
+
+```bash
+docker compose up --build
+```
+
+Esto crea dos servicios:
+
+- `db`: MySQL 8.4 con la base `gestion_donacion_alimentos`, inicializada desde `database/gestion_donacion_alimentos.sql`.
+- `app`: backend HTTP Java que compila con Maven y queda escuchando en `http://localhost:18080`.
+
+Endpoints disponibles:
+
+```text
+GET http://localhost:18080/health
+```
+
+CRUD disponible:
+
+| Entidad | Listar | Consultar | Crear | Actualizar | Eliminar |
+|---------|--------|-----------|-------|------------|----------|
+| Donantes | `GET /api/donantes` | `GET /api/donantes/{id}` | `POST /api/donantes` | `PUT /api/donantes/{id}` | `DELETE /api/donantes/{id}` |
+| Productos | `GET /api/productos` | `GET /api/productos/{id}` | `POST /api/productos` | `PUT /api/productos/{id}` | `DELETE /api/productos/{id}` |
+| Beneficiarios | `GET /api/beneficiarios` | `GET /api/beneficiarios/{id}` | `POST /api/beneficiarios` | `PUT /api/beneficiarios/{id}` | `DELETE /api/beneficiarios/{id}` |
+| Entregas | `GET /api/entregas` | `GET /api/entregas/{id}` | `POST /api/entregas` | `PUT /api/entregas/{id}` | `DELETE /api/entregas/{id}` |
+
+Ejemplo para crear un donante:
+
+```bash
+curl -X POST http://localhost:18080/api/donantes \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Donante Nuevo","tipoDonante":"Persona","telefono":"3000000000","correo":"donante@example.com","direccion":"Cali"}'
+```
+
+Los campos de fecha se envian en formato `YYYY-MM-DD`, por ejemplo `fechaVencimiento` o `fechaEntrega`.
+
+Ejemplos de cuerpos JSON:
+
+Crear producto:
+
+```json
+{
+  "nombreProducto": "Arroz Postman",
+  "categoria": "Granos",
+  "unidadMedida": "Kg",
+  "fechaVencimiento": "2027-12-31"
+}
+```
+
+Crear beneficiario:
+
+```json
+{
+  "nombre": "Beneficiario Postman",
+  "documento": "123456789",
+  "telefono": "3222222222",
+  "direccion": "Palmira",
+  "numeroIntegrantes": 4,
+  "condicion": "Bajos recursos"
+}
+```
+
+Crear entrega:
+
+```json
+{
+  "idBeneficiario": 1,
+  "fechaEntrega": "2026-07-01",
+  "responsable": "Responsable Postman",
+  "observacion": "Entrega creada desde Postman"
+}
+```
+
+## Pruebas con Postman
+
+El repositorio incluye una coleccion lista para importar en Postman:
+
+```text
+Gestion_Donacion_Alimentos_Postman_Collection.json
+```
+
+Pasos:
+
+1. Abrir Postman.
+2. Seleccionar `Import`.
+3. Importar el archivo `Gestion_Donacion_Alimentos_Postman_Collection.json`.
+4. Verificar que la variable `baseUrl` tenga el valor `http://localhost:18080`.
+5. Ejecutar primero `Health` y luego las solicitudes CRUD.
+
+La coleccion incluye solicitudes para listar, consultar, crear, actualizar y eliminar registros de Donantes, Productos, Beneficiarios y Entregas.
+
+## Frontend estatico
+
+El proyecto incluye una interfaz inicial en:
+
+```text
+frontend/index.html
+```
+
+La estructura recomendada queda separada del backend Java:
+
+```text
+frontend/
+├── index.html
+├── css/
+│   └── estilos.css
+└── js/
+    └── app.js
+```
+
+Para usarla:
+
+1. Levantar el backend con `docker compose up -d --build`.
+2. Abrir `frontend/index.html` en el navegador.
+
+Por ahora los formularios son visuales. Las tablas y contadores cargan datos reales desde los endpoints `GET` del backend en `http://localhost:18080`.
+
+Para ejecutar la demo de consola manualmente:
+
+```bash
+docker compose run --rm app demo
+```
+
+Para detener y conservar los datos:
+
+```bash
+docker compose down
+```
+
+Para reiniciar la base de datos desde cero:
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+La aplicacion usa variables de entorno para conectarse a MySQL:
+
+```text
+DB_HOST=db
+DB_PORT=3306
+DB_NAME=gestion_donacion_alimentos
+DB_USER=root
+DB_PASSWORD=root
+```
+
+## Arquitectura actual
+
+La aplicacion conserva las capas DAO y DTO existentes y agrega una capa HTTP simple:
+
+- `src/config/ConexionBD.java`: centraliza la conexion JDBC usando variables de entorno.
+- `src/dao/`: contiene las operaciones SQL por entidad.
+- `src/dto/`: contiene los objetos de transferencia.
+- `src/server/BackendServer.java`: expone el backend HTTP y convierte JSON hacia/desde los DTO.
+- `Main.java`: arranca el servidor con el argumento `server` o ejecuta la demo de consola sin argumentos.
+
+El contenedor `app` ejecuta por defecto:
+
+```bash
+java -jar app.jar server
+```
 
 ### Responsabilidades
 
@@ -149,7 +321,13 @@ gestion_donacion_alimentos.sql
 
 ---
 
-# Definición de Entidades
+# Estado Actual del Modelo Implementado
+
+El SQL ejecutable del proyecto se encuentra en `database/gestion_donacion_alimentos.sql`. Ese script crea la base `gestion_donacion_alimentos` con las tablas usadas por los DAO y por el backend HTTP actual.
+
+El documento `docs/modelo_relacional_donacion_alimentos.md` describe una propuesta normalizada más amplia con `detalle_donacion`, `detalle_entrega`, categorías e inventario por lote. Esa propuesta queda documentada como evolución del modelo, pero no está implementada todavía en el SQL ni en el backend actual.
+
+# Definición de Entidades Implementadas
 
 ## Donantes
 
@@ -186,19 +364,6 @@ gestion_donacion_alimentos.sql
 | unidad_medida | VARCHAR(20) | Kg, Litro, Unidad |
 | fecha_vencimiento | DATE | Fecha de vencimiento |
 
----
-
-## Detalle_Donacion
-
-| Campo | Tipo | Descripción |
-|---------|---------|---------|
-| id_detalle_donacion | INT PK | Identificador único |
-| id_donacion | INT FK | Donación relacionada |
-| id_producto | INT FK | Producto relacionado |
-| cantidad | DECIMAL(10,2) | Cantidad donada |
-
----
-
 ## Beneficiarios
 
 | Campo | Tipo | Descripción |
@@ -223,27 +388,13 @@ gestion_donacion_alimentos.sql
 | responsable | VARCHAR(100) | Responsable de la entrega |
 | observacion | VARCHAR(200) | Observaciones |
 
----
-
-## Detalle_Entrega
-
-| Campo | Tipo | Descripción |
-|---------|---------|---------|
-| id_detalle_entrega | INT PK | Identificador único |
-| id_entrega | INT FK | Entrega relacionada |
-| id_producto | INT FK | Producto relacionado |
-| cantidad | DECIMAL(10,2) | Cantidad entregada |
-
----
-
 # Relaciones Principales
 
 - Un Donante puede realizar muchas Donaciones.
-- Una Donación puede contener varios Productos.
-- Un Producto puede estar presente en varias Donaciones.
 - Un Beneficiario puede recibir varias Entregas.
-- Una Entrega puede contener varios Productos.
-- Un Producto puede aparecer en múltiples Entregas.
+- La tabla `productos` funciona como catálogo simple de alimentos con categoría, unidad y fecha de vencimiento.
+- El modelo implementado no registra aún detalle por lote ni detalle de productos entregados.
+- La documentación de modelo normalizado propone agregar `detalle_donacion` y `detalle_entrega` para mejorar trazabilidad de inventario.
 
 ---
 
@@ -252,24 +403,29 @@ gestion_donacion_alimentos.sql
 ```text
 sistema-donacion-alimentos/
 │
+├── .dockerignore
+├── .gitignore
 ├── README.md
+├── pom.xml
+├── Dockerfile
+├── docker-compose.yml
+├── Gestion_Donacion_Alimentos_Postman_Collection.json
+│
+├── frontend/
+│   ├── index.html
+│   ├── css/
+│   │   └── estilos.css
+│   └── js/
+│       └── app.js
 │
 ├── docs/
 │   ├── problematica.md
-│   ├── modelo-relacional.md
-│   ├── normalizacion.md
-│   ├── evidencias.md
-│   └── guion-video.md
+│   ├── modelo_relacional_donacion_alimentos.md
+│   ├── Entrega 2 - Punto 4.md
+│   └── evidencias.md
 │
 ├── database/
-│   ├── 01_crear_base_datos.sql
-│   ├── 02_crear_tablas.sql
-│   ├── 03_insertar_datos.sql
-│   └── 04_consultas.sql
-│
-├── diagrams/
-│   ├── modelo-logico.png
-│   └── modelo-relacional.png
+│   └── gestion_donacion_alimentos.sql
 │
 ├── src/
 │   ├── dto/
@@ -289,14 +445,10 @@ sistema-donacion-alimentos/
 │   ├── config/
 │   │   └── ConexionBD.java
 │   │
+│   ├── server/
+│   │   └── BackendServer.java
+│   │
 │   └── Main.java
-│
-└── evidencias/
-    ├── modelo.png
-    ├── tablas.png
-    ├── inserciones.png
-    ├── consultas.png
-    └── dao-dto.png
 ```
 
 ---

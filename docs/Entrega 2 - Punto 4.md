@@ -46,9 +46,11 @@ Por ejemplo:
 
 ```
 src/
-  Main.java                ← Clase principal / demo de operaciones
+  Main.java                ← Clase principal / demo de operaciones o arranque del servidor
   config/
-    ConexionBD.java        ← Singleton de conexión JDBC a MySQL
+    ConexionBD.java        ← Conexión JDBC a MySQL usando variables de entorno
+  server/
+    BackendServer.java     ← Backend HTTP para exponer endpoints CRUD en JSON
   dto/
     DonanteDTO.java        ← DTO de la entidad Donante
     DonacionDTO.java       ← DTO de la entidad Donacion
@@ -67,7 +69,7 @@ src/
 
 ## 4. Configuración de Conexión — `ConexionBD.java`
 
-La clase `ConexionBD` implementa el patrón **Singleton**: garantiza una única conexión activa a MySQL durante toda la ejecución, evitando abrir y cerrar conexiones repetidamente.
+La clase `ConexionBD` centraliza la conexión JDBC a MySQL y lee sus valores desde variables de entorno. Esto permite ejecutar el proyecto tanto localmente como dentro de Docker Compose sin modificar el código fuente.
 
 ```java
 public static Connection getConexion() throws SQLException {
@@ -79,12 +81,17 @@ public static Connection getConexion() throws SQLException {
 }
 ```
 
-> **NOTA PARA INTEGRANTE #3 - DB** antes de ejecutar, por favor reemplazar con valores reales en `ConexionBD.java`:
-> ```java
-> private static final String URL = "jdbc:mysql://localhost:3306/NOMBRE_BASE_DE_DATOS";
-> private static final String USUARIO = "USUARIO_MYSQL";
-> private static final String PASSWORD = "CONTRASEÑA_MYSQL";
-> ```
+Variables usadas por la aplicación:
+
+```text
+DB_HOST=db
+DB_PORT=3306
+DB_NAME=gestion_donacion_alimentos
+DB_USER=root
+DB_PASSWORD=root
+```
+
+En Docker Compose, el servicio `app` usa `DB_HOST=db` para conectarse al servicio MySQL llamado `db`.
 
 ---
 
@@ -173,7 +180,7 @@ public class DonanteDTO {
 Recibe un `DonanteDTO` y ejecuta un `INSERT` con `PreparedStatement`. Los `?` se asignan con `setString`/`setInt`, previniendo inyección SQL.
 
 ```java
-String sql = "INSERT INTO Donantes (nombre, tipo_donante, telefono, correo, direccion) "
+String sql = "INSERT INTO donantes (nombre, tipo_donante, telefono, correo, direccion) "
            + "VALUES (?, ?, ?, ?, ?)";
 ps.setString(1, dto.getNombre());
 ps.setString(2, dto.getTipoDonante());
@@ -201,13 +208,13 @@ if (rs.next()) {
 ```
 
 #### `consultarTodos()`
-Ejecuta un `SELECT * FROM Donantes ORDER BY nombre` y retorna una `List<DonanteDTO>`.
+Ejecuta un `SELECT * FROM donantes ORDER BY nombre` y retorna una `List<DonanteDTO>`.
 
 #### `actualizar(DonanteDTO dto)`
 Ejecuta un `UPDATE SET` con todos los campos del DTO. El `WHERE` usa el `idDonante` para identificar el registro a modificar.
 
 ```java
-String sql = "UPDATE Donantes SET nombre=?, tipo_donante=?, telefono=?, "
+String sql = "UPDATE donantes SET nombre=?, tipo_donante=?, telefono=?, "
            + "correo=?, direccion=? WHERE id_donante=?";
 ```
 
@@ -247,14 +254,19 @@ CRUD completo. `consultarTodos()` retorna la lista ordenada alfabéticamente por
 Incluye `consultarPorBeneficiario(int idBeneficiario)` para ver el historial de entregas de una familia beneficiaria:
 
 ```java
-String sql = "SELECT * FROM Entregas WHERE id_beneficiario = ? ORDER BY fecha_entrega DESC";
+String sql = "SELECT * FROM entregas WHERE id_beneficiario = ? ORDER BY fecha_entrega DESC";
 ```
 
 ---
 
-## 7. Demostración — `Main.java`
+## 7. Demostración y Backend HTTP — `Main.java`
 
-La clase `Main` ejecuta operaciones reales contra la base de datos, demostrando los cuatro casos requeridos.
+La clase `Main` puede ejecutarse de dos formas:
+
+- Sin argumentos: ejecuta la demo de consola con operaciones reales contra la base de datos.
+- Con el argumento `server`: inicia `BackendServer` y expone endpoints HTTP para el CRUD.
+
+En Docker, el contenedor `app` ejecuta por defecto `java -jar app.jar server`.
 
 ### 7.1 Inserción de un Donante
 

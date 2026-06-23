@@ -20,7 +20,7 @@ public class DonanteDAO {
      * @return true si la insercion fue exitosa, false en caso contrario
      */
     public boolean insertar(DonanteDTO dto) {
-        String sql = "INSERT INTO Donantes (nombre, tipo_donante, telefono, correo, direccion) "
+        String sql = "INSERT INTO donantes (nombre, tipo_donante, telefono, correo, direccion) "
                    + "VALUES (?, ?, ?, ?, ?)";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -49,7 +49,7 @@ public class DonanteDAO {
      * @return DonanteDTO con los datos encontrados, o null si no existe
      */
     public DonanteDTO consultarPorId(int id) {
-        String sql = "SELECT * FROM Donantes WHERE id_donante = ?";
+        String sql = "SELECT * FROM donantes WHERE id_donante = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -73,7 +73,7 @@ public class DonanteDAO {
      */
     public List<DonanteDTO> consultarTodos() {
         List<DonanteDTO> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Donantes ORDER BY nombre";
+        String sql = "SELECT * FROM donantes ORDER BY nombre";
         try (Connection con = ConexionBD.getConexion();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -95,7 +95,7 @@ public class DonanteDAO {
      * @return true si la actualización fue exitosa
      */
     public boolean actualizar(DonanteDTO dto) {
-        String sql = "UPDATE Donantes SET nombre=?, tipo_donante=?, telefono=?, "
+        String sql = "UPDATE donantes SET nombre=?, tipo_donante=?, telefono=?, "
                    + "correo=?, direccion=? WHERE id_donante=?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -125,7 +125,7 @@ public class DonanteDAO {
      * @return true si la eliminación fue exitosa
      */
     public boolean eliminar(int id) {
-        String sql = "DELETE FROM Donantes WHERE id_donante = ?";
+        String sql = "DELETE FROM donantes WHERE id_donante = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 

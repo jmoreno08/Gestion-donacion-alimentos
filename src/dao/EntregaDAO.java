@@ -14,7 +14,7 @@ import java.util.List;
 public class EntregaDAO {
 
     public boolean insertar(EntregaDTO dto) {
-        String sql = "INSERT INTO Entregas (id_beneficiario, fecha_entrega, responsable, observacion) "
+        String sql = "INSERT INTO entregas (id_beneficiario, fecha_entrega, responsable, observacion) "
                    + "VALUES (?, ?, ?, ?)";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -35,7 +35,7 @@ public class EntregaDAO {
     }
 
     public EntregaDTO consultarPorId(int id) {
-        String sql = "SELECT * FROM Entregas WHERE id_entrega = ?";
+        String sql = "SELECT * FROM entregas WHERE id_entrega = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -51,7 +51,7 @@ public class EntregaDAO {
 
     public List<EntregaDTO> consultarPorBeneficiario(int idBeneficiario) {
         List<EntregaDTO> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Entregas WHERE id_beneficiario = ? ORDER BY fecha_entrega DESC";
+        String sql = "SELECT * FROM entregas WHERE id_beneficiario = ? ORDER BY fecha_entrega DESC";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -65,8 +65,23 @@ public class EntregaDAO {
         return lista;
     }
 
+    public List<EntregaDTO> consultarTodos() {
+        List<EntregaDTO> lista = new ArrayList<>();
+        String sql = "SELECT * FROM entregas ORDER BY fecha_entrega DESC";
+        try (Connection con = ConexionBD.getConexion();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) lista.add(mapear(rs));
+
+        } catch (SQLException e) {
+            System.err.println("Error al consultar entregas: " + e.getMessage());
+        }
+        return lista;
+    }
+
     public boolean actualizar(EntregaDTO dto) {
-        String sql = "UPDATE Entregas SET id_beneficiario=?, fecha_entrega=?, "
+        String sql = "UPDATE entregas SET id_beneficiario=?, fecha_entrega=?, "
                    + "responsable=?, observacion=? WHERE id_entrega=?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -86,7 +101,7 @@ public class EntregaDAO {
     }
 
     public boolean eliminar(int id) {
-        String sql = "DELETE FROM Entregas WHERE id_entrega = ?";
+        String sql = "DELETE FROM entregas WHERE id_entrega = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
