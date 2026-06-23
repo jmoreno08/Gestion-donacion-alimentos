@@ -102,11 +102,12 @@ Proyecto desarrollado en Java y MySQL.
 
 ## Tecnologías
 
-* Java
+* Java 17
 * JDBC
 * MySQL
-* XAMPP
-* phpMyAdmin
+* Maven
+* Docker / Docker Compose
+* Postman
 
 ## Base de datos
 
@@ -158,6 +159,61 @@ curl -X POST http://localhost:18080/api/donantes \
 
 Los campos de fecha se envian en formato `YYYY-MM-DD`, por ejemplo `fechaVencimiento` o `fechaEntrega`.
 
+Ejemplos de cuerpos JSON:
+
+Crear producto:
+
+```json
+{
+  "nombreProducto": "Arroz Postman",
+  "categoria": "Granos",
+  "unidadMedida": "Kg",
+  "fechaVencimiento": "2027-12-31"
+}
+```
+
+Crear beneficiario:
+
+```json
+{
+  "nombre": "Beneficiario Postman",
+  "documento": "123456789",
+  "telefono": "3222222222",
+  "direccion": "Palmira",
+  "numeroIntegrantes": 4,
+  "condicion": "Bajos recursos"
+}
+```
+
+Crear entrega:
+
+```json
+{
+  "idBeneficiario": 1,
+  "fechaEntrega": "2026-07-01",
+  "responsable": "Responsable Postman",
+  "observacion": "Entrega creada desde Postman"
+}
+```
+
+## Pruebas con Postman
+
+El repositorio incluye una coleccion lista para importar en Postman:
+
+```text
+Gestion_Donacion_Alimentos_Postman_Collection.json
+```
+
+Pasos:
+
+1. Abrir Postman.
+2. Seleccionar `Import`.
+3. Importar el archivo `Gestion_Donacion_Alimentos_Postman_Collection.json`.
+4. Verificar que la variable `baseUrl` tenga el valor `http://localhost:18080`.
+5. Ejecutar primero `Health` y luego las solicitudes CRUD.
+
+La coleccion incluye solicitudes para listar, consultar, crear, actualizar y eliminar registros de Donantes, Productos, Beneficiarios y Entregas.
+
 Para ejecutar la demo de consola manualmente:
 
 ```bash
@@ -185,6 +241,22 @@ DB_PORT=3306
 DB_NAME=gestion_donacion_alimentos
 DB_USER=root
 DB_PASSWORD=root
+```
+
+## Arquitectura actual
+
+La aplicacion conserva las capas DAO y DTO existentes y agrega una capa HTTP simple:
+
+- `src/config/ConexionBD.java`: centraliza la conexion JDBC usando variables de entorno.
+- `src/dao/`: contiene las operaciones SQL por entidad.
+- `src/dto/`: contiene los objetos de transferencia.
+- `src/server/BackendServer.java`: expone el backend HTTP y convierte JSON hacia/desde los DTO.
+- `Main.java`: arranca el servidor con el argumento `server` o ejecuta la demo de consola sin argumentos.
+
+El contenedor `app` ejecuta por defecto:
+
+```bash
+java -jar app.jar server
 ```
 
 ### Responsabilidades
@@ -326,6 +398,11 @@ DB_PASSWORD=root
 sistema-donacion-alimentos/
 │
 ├── README.md
+├── pom.xml
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── Gestion_Donacion_Alimentos_Postman_Collection.json
 │
 ├── docs/
 │   ├── problematica.md
@@ -361,6 +438,9 @@ sistema-donacion-alimentos/
 │   │
 │   ├── config/
 │   │   └── ConexionBD.java
+│   │
+│   ├── server/
+│   │   └── BackendServer.java
 │   │
 │   └── Main.java
 │
