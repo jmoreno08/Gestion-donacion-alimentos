@@ -16,6 +16,10 @@
     --info: #1976d2;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 body {
     min-height: 100vh;
     background: var(--page);
@@ -177,6 +181,11 @@ h2 {
     gap: 14px 18px;
 }
 
+.formulario form.editing {
+    border-left: 4px solid var(--info);
+    padding-left: 16px;
+}
+
 .formulario label {
     align-self: end;
     color: var(--ink);
@@ -213,6 +222,26 @@ h2 {
     background: var(--green-dark);
 }
 
+.form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.form-actions button {
+    flex: 1 1 180px;
+}
+
+.formulario button.secundario {
+    background: #eef2f7;
+    color: var(--ink);
+}
+
+.formulario button.secundario:hover {
+    background: #dbe4ef;
+}
+
 .tabla-contenedor {
     margin-top: 22px;
     margin-bottom: 30px;
@@ -247,6 +276,10 @@ td {
     padding: 12px;
 }
 
+td:last-child {
+    white-space: nowrap;
+}
+
 tr:hover td {
     background: #f8fbf8;
 }
@@ -275,6 +308,36 @@ tr:hover td {
 
 .eliminar:hover {
     background: #b71c1c;
+}
+
+.toast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 20;
+    max-width: min(360px, calc(100vw - 48px));
+    border-radius: 8px;
+    box-shadow: 0 16px 36px rgba(27, 38, 59, 0.22);
+    color: white;
+    font-weight: 700;
+    opacity: 0;
+    padding: 14px 16px;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.ok {
+    background: var(--green);
+}
+
+.toast.error {
+    background: var(--danger);
 }
 
 @media (max-width: 880px) {
@@ -313,5 +376,9 @@ tr:hover td {
 
     .formulario form {
         grid-template-columns: 1fr;
+    }
+
+    .formulario form.editing {
+        padding-left: 12px;
     }
 }

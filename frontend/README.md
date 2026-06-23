@@ -29,4 +29,11 @@ La interfaz consulta la API en:
 http://localhost:18080
 ```
 
-Por ahora los formularios son visuales. Las tablas y contadores cargan datos reales desde los endpoints `GET` del backend.
+La interfaz consume el CRUD completo de Donantes, Beneficiarios, Productos y Entregas:
+
+- `GET`: carga tablas y contadores.
+- `POST`: crea registros desde los formularios.
+- `PUT`: actualiza registros usando la accion Editar.
+- `DELETE`: elimina registros usando la accion Eliminar.
+
+Si el backend corre en otro puerto, actualizar `API_BASE_URL` en `frontend/js/app.js`.

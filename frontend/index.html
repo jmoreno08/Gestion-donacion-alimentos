@@ -58,23 +58,28 @@
             <section class="modulo" id="donantes">
                 <h2>Gestión de Donantes</h2>
                 <div class="formulario">
-                    <form>
+                    <form data-entity="donantes">
+                        <input type="hidden" name="id">
+
                         <label>Nombre completo</label>
-                        <input type="text" placeholder="Nombre del donante">
+                        <input type="text" name="nombre" placeholder="Nombre del donante" required>
 
                         <label>Tipo de donante</label>
-                        <input type="text" placeholder="Persona, Empresa o Fundación">
+                        <input type="text" name="tipoDonante" placeholder="Persona, Empresa o Fundación" required>
 
                         <label>Teléfono</label>
-                        <input type="text" placeholder="Número de contacto">
+                        <input type="text" name="telefono" placeholder="Número de contacto">
 
                         <label>Correo electrónico</label>
-                        <input type="email" placeholder="correo@ejemplo.com">
+                        <input type="email" name="correo" placeholder="correo@ejemplo.com">
 
                         <label>Dirección</label>
-                        <input type="text" placeholder="Ciudad o dirección">
+                        <input type="text" name="direccion" placeholder="Ciudad o dirección">
 
-                        <button type="submit">Guardar donante</button>
+                        <div class="form-actions">
+                            <button type="submit">Guardar donante</button>
+                            <button class="secundario" type="button" data-cancel hidden>Cancelar edición</button>
+                        </div>
                     </form>
                 </div>
 
@@ -92,9 +97,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-donantes">
-                            <tr>
-                                <td colspan="6">Cargando datos...</td>
-                            </tr>
+                            <tr><td colspan="6">Cargando datos...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -103,26 +106,31 @@
             <section class="modulo" id="beneficiarios">
                 <h2>Gestión de Beneficiarios</h2>
                 <div class="formulario">
-                    <form>
+                    <form data-entity="beneficiarios">
+                        <input type="hidden" name="id">
+
                         <label>Nombre completo</label>
-                        <input type="text" placeholder="Nombre del beneficiario">
+                        <input type="text" name="nombre" placeholder="Nombre del beneficiario" required>
 
                         <label>Documento</label>
-                        <input type="text" placeholder="Documento de identidad">
+                        <input type="text" name="documento" placeholder="Documento de identidad" required>
 
                         <label>Teléfono</label>
-                        <input type="text" placeholder="Número de contacto">
+                        <input type="text" name="telefono" placeholder="Número de contacto">
 
                         <label>Dirección</label>
-                        <input type="text" placeholder="Ciudad o dirección">
+                        <input type="text" name="direccion" placeholder="Ciudad o dirección">
 
                         <label>Número de integrantes</label>
-                        <input type="number" min="1" placeholder="Integrantes del hogar">
+                        <input type="number" min="1" name="numeroIntegrantes" placeholder="Integrantes del hogar" required>
 
                         <label>Condición</label>
-                        <input type="text" placeholder="Condición social">
+                        <input type="text" name="condicion" placeholder="Condición social">
 
-                        <button type="submit">Guardar beneficiario</button>
+                        <div class="form-actions">
+                            <button type="submit">Guardar beneficiario</button>
+                            <button class="secundario" type="button" data-cancel hidden>Cancelar edición</button>
+                        </div>
                     </form>
                 </div>
 
@@ -140,9 +148,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-beneficiarios">
-                            <tr>
-                                <td colspan="6">Cargando datos...</td>
-                            </tr>
+                            <tr><td colspan="6">Cargando datos...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -151,20 +157,25 @@
             <section class="modulo" id="productos">
                 <h2>Gestión de Productos</h2>
                 <div class="formulario">
-                    <form>
+                    <form data-entity="productos">
+                        <input type="hidden" name="id">
+
                         <label>Nombre producto</label>
-                        <input type="text" placeholder="Nombre del producto">
+                        <input type="text" name="nombreProducto" placeholder="Nombre del producto" required>
 
                         <label>Categoría</label>
-                        <input type="text" placeholder="Ej: Granos, Lácteos, Conservas">
+                        <input type="text" name="categoria" placeholder="Ej: Granos, Lácteos, Conservas">
 
                         <label>Unidad de medida</label>
-                        <input type="text" placeholder="Kg, Litro, Unidad">
+                        <input type="text" name="unidadMedida" placeholder="Kg, Litro, Unidad">
 
                         <label>Fecha de vencimiento</label>
-                        <input type="date">
+                        <input type="date" name="fechaVencimiento" required>
 
-                        <button type="submit">Guardar producto</button>
+                        <div class="form-actions">
+                            <button type="submit">Guardar producto</button>
+                            <button class="secundario" type="button" data-cancel hidden>Cancelar edición</button>
+                        </div>
                     </form>
                 </div>
 
@@ -182,9 +193,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-productos">
-                            <tr>
-                                <td colspan="6">Cargando datos...</td>
-                            </tr>
+                            <tr><td colspan="6">Cargando datos...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -193,20 +202,25 @@
             <section class="modulo" id="entregas">
                 <h2>Gestión de Entregas</h2>
                 <div class="formulario">
-                    <form>
+                    <form data-entity="entregas">
+                        <input type="hidden" name="id">
+
                         <label>ID beneficiario</label>
-                        <input type="number" min="1" placeholder="Beneficiario asociado">
+                        <input type="number" min="1" name="idBeneficiario" placeholder="Beneficiario asociado" required>
 
                         <label>Fecha de entrega</label>
-                        <input type="date">
+                        <input type="date" name="fechaEntrega" required>
 
                         <label>Responsable</label>
-                        <input type="text" placeholder="Responsable de la entrega">
+                        <input type="text" name="responsable" placeholder="Responsable de la entrega">
 
                         <label>Observación</label>
-                        <input type="text" placeholder="Detalle de la entrega">
+                        <input type="text" name="observacion" placeholder="Detalle de la entrega">
 
-                        <button type="submit">Registrar entrega</button>
+                        <div class="form-actions">
+                            <button type="submit">Registrar entrega</button>
+                            <button class="secundario" type="button" data-cancel hidden>Cancelar edición</button>
+                        </div>
                     </form>
                 </div>
 
@@ -224,9 +238,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-entregas">
-                            <tr>
-                                <td colspan="6">Cargando datos...</td>
-                            </tr>
+                            <tr><td colspan="6">Cargando datos...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -240,5 +252,7 @@
             </section>
         </main>
     </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

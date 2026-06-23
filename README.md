@@ -239,7 +239,7 @@ Para usarla:
 1. Levantar el backend con `docker compose up -d --build`.
 2. Abrir `frontend/index.html` en el navegador.
 
-Por ahora los formularios son visuales. Las tablas y contadores cargan datos reales desde los endpoints `GET` del backend en `http://localhost:18080`.
+La interfaz consume el CRUD completo del backend en `http://localhost:18080`: lista registros, crea desde formularios, edita con la accion `Editar` y elimina con la accion `Eliminar` para Donantes, Beneficiarios, Productos y Entregas. Si el backend corre en otro puerto, ajustar `API_BASE_URL` en `frontend/js/app.js`.
 
 Para ejecutar la demo de consola manualmente:
 
