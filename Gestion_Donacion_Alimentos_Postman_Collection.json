@@ -1,0 +1,277 @@
+{
+  "info": {
+    "name": "Gestion Donacion Alimentos API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:18080"
+    },
+    {
+      "key": "donanteId",
+      "value": "1"
+    },
+    {
+      "key": "productoId",
+      "value": "1"
+    },
+    {
+      "key": "beneficiarioId",
+      "value": "1"
+    },
+    {
+      "key": "entregaId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Donantes",
+      "item": [
+        {
+          "name": "Listar Donantes",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/donantes"
+          }
+        },
+        {
+          "name": "Consultar Donante",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/donantes/{{donanteId}}"
+          }
+        },
+        {
+          "name": "Crear Donante",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/donantes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Donante Postman\",\n  \"tipoDonante\": \"Persona\",\n  \"telefono\": \"3001234567\",\n  \"correo\": \"postman@donante.com\",\n  \"direccion\": \"Cali\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar Donante",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/donantes/{{donanteId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Donante Actualizado\",\n  \"tipoDonante\": \"Empresa\",\n  \"telefono\": \"3119999999\",\n  \"correo\": \"actualizado@donante.com\",\n  \"direccion\": \"Bogota\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar Donante",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/donantes/{{donanteId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Listar Productos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos"
+          }
+        },
+        {
+          "name": "Consultar Producto",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          }
+        },
+        {
+          "name": "Crear Producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreProducto\": \"Arroz Postman\",\n  \"categoria\": \"Granos\",\n  \"unidadMedida\": \"Kg\",\n  \"fechaVencimiento\": \"2027-12-31\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar Producto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos/{{productoId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreProducto\": \"Arroz Actualizado\",\n  \"categoria\": \"Granos\",\n  \"unidadMedida\": \"Kg\",\n  \"fechaVencimiento\": \"2028-01-15\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar Producto",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Beneficiarios",
+      "item": [
+        {
+          "name": "Listar Beneficiarios",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/beneficiarios"
+          }
+        },
+        {
+          "name": "Consultar Beneficiario",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/beneficiarios/{{beneficiarioId}}"
+          }
+        },
+        {
+          "name": "Crear Beneficiario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/beneficiarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Beneficiario Postman\",\n  \"documento\": \"123456789\",\n  \"telefono\": \"3222222222\",\n  \"direccion\": \"Palmira\",\n  \"numeroIntegrantes\": 4,\n  \"condicion\": \"Bajos recursos\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar Beneficiario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/beneficiarios/{{beneficiarioId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Beneficiario Actualizado\",\n  \"documento\": \"123456789\",\n  \"telefono\": \"3333333333\",\n  \"direccion\": \"Cali\",\n  \"numeroIntegrantes\": 5,\n  \"condicion\": \"Actualizado\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar Beneficiario",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/beneficiarios/{{beneficiarioId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Entregas",
+      "item": [
+        {
+          "name": "Listar Entregas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/entregas"
+          }
+        },
+        {
+          "name": "Consultar Entrega",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/entregas/{{entregaId}}"
+          }
+        },
+        {
+          "name": "Crear Entrega",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/entregas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idBeneficiario\": 1,\n  \"fechaEntrega\": \"2026-07-01\",\n  \"responsable\": \"Responsable Postman\",\n  \"observacion\": \"Entrega creada desde Postman\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar Entrega",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/entregas/{{entregaId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idBeneficiario\": 1,\n  \"fechaEntrega\": \"2026-07-02\",\n  \"responsable\": \"Responsable Actualizado\",\n  \"observacion\": \"Entrega actualizada desde Postman\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar Entrega",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/entregas/{{entregaId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
