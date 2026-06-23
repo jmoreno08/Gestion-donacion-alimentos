@@ -114,6 +114,79 @@ La base de datos se encuentra en el archivo:
 
 gestion_donacion_alimentos.sql
 
+## Ejecucion con Docker
+
+El proyecto puede ejecutarse en contenedores sin instalar Java, Maven, MySQL, XAMPP ni phpMyAdmin en el equipo.
+
+Requisitos:
+
+- Docker Desktop
+
+Comandos principales:
+
+```bash
+docker compose up --build
+```
+
+Esto crea dos servicios:
+
+- `db`: MySQL 8.4 con la base `gestion_donacion_alimentos`, inicializada desde `database/gestion_donacion_alimentos.sql`.
+- `app`: backend HTTP Java que compila con Maven y queda escuchando en `http://localhost:18080`.
+
+Endpoints disponibles:
+
+```text
+GET http://localhost:18080/health
+```
+
+CRUD disponible:
+
+| Entidad | Listar | Consultar | Crear | Actualizar | Eliminar |
+|---------|--------|-----------|-------|------------|----------|
+| Donantes | `GET /api/donantes` | `GET /api/donantes/{id}` | `POST /api/donantes` | `PUT /api/donantes/{id}` | `DELETE /api/donantes/{id}` |
+| Productos | `GET /api/productos` | `GET /api/productos/{id}` | `POST /api/productos` | `PUT /api/productos/{id}` | `DELETE /api/productos/{id}` |
+| Beneficiarios | `GET /api/beneficiarios` | `GET /api/beneficiarios/{id}` | `POST /api/beneficiarios` | `PUT /api/beneficiarios/{id}` | `DELETE /api/beneficiarios/{id}` |
+| Entregas | `GET /api/entregas` | `GET /api/entregas/{id}` | `POST /api/entregas` | `PUT /api/entregas/{id}` | `DELETE /api/entregas/{id}` |
+
+Ejemplo para crear un donante:
+
+```bash
+curl -X POST http://localhost:18080/api/donantes \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Donante Nuevo","tipoDonante":"Persona","telefono":"3000000000","correo":"donante@example.com","direccion":"Cali"}'
+```
+
+Los campos de fecha se envian en formato `YYYY-MM-DD`, por ejemplo `fechaVencimiento` o `fechaEntrega`.
+
+Para ejecutar la demo de consola manualmente:
+
+```bash
+docker compose run --rm app demo
+```
+
+Para detener y conservar los datos:
+
+```bash
+docker compose down
+```
+
+Para reiniciar la base de datos desde cero:
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+La aplicacion usa variables de entorno para conectarse a MySQL:
+
+```text
+DB_HOST=db
+DB_PORT=3306
+DB_NAME=gestion_donacion_alimentos
+DB_USER=root
+DB_PASSWORD=root
+```
+
 ### Responsabilidades
 
 - Crear la base de datos.

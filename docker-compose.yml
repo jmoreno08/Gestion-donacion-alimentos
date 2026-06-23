@@ -1,0 +1,36 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: gestion-donacion-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gestion_donacion_alimentos
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/gestion_donacion_alimentos.sql:/docker-entrypoint-initdb.d/01_gestion_donacion_alimentos.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "3306", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    container_name: gestion-donacion-app
+    ports:
+      - "18080:8080"
+    environment:
+      APP_PORT: 8080
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: gestion_donacion_alimentos
+      DB_USER: root
+      DB_PASSWORD: root
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:

@@ -1,6 +1,7 @@
 import config.ConexionBD;
 import dao.*;
 import dto.*;
+import server.BackendServer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,7 +17,11 @@ import java.util.List;
  */
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        if (args.length > 0 && "server".equalsIgnoreCase(args[0])) {
+            BackendServer.start();
+            return;
+        }
 
         System.out.println("=================================================");
         System.out.println("  SISTEMA DE GESTIÓN DE DONACIÓN DE ALIMENTOS   ");

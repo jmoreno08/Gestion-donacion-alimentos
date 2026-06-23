@@ -15,7 +15,7 @@ import java.util.List;
 public class DonacionDAO {
 
     public boolean insertar(DonacionDTO dto) {
-        String sql = "INSERT INTO Donaciones (id_donante, fecha_donacion, estado, observacion) "
+        String sql = "INSERT INTO donaciones (id_donante, fecha_donacion, estado, observacion) "
                    + "VALUES (?, ?, ?, ?)";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -36,7 +36,7 @@ public class DonacionDAO {
     }
 
     public DonacionDTO consultarPorId(int id) {
-        String sql = "SELECT * FROM Donaciones WHERE id_donacion = ?";
+        String sql = "SELECT * FROM donaciones WHERE id_donacion = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -52,7 +52,7 @@ public class DonacionDAO {
 
     public List<DonacionDTO> consultarPorDonante(int idDonante) {
         List<DonacionDTO> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Donaciones WHERE id_donante = ? ORDER BY fecha_donacion DESC";
+        String sql = "SELECT * FROM donaciones WHERE id_donante = ? ORDER BY fecha_donacion DESC";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -67,7 +67,7 @@ public class DonacionDAO {
     }
 
     public boolean actualizar(DonacionDTO dto) {
-        String sql = "UPDATE Donaciones SET id_donante=?, fecha_donacion=?, estado=?, "
+        String sql = "UPDATE donaciones SET id_donante=?, fecha_donacion=?, estado=?, "
                    + "observacion=? WHERE id_donacion=?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -88,7 +88,7 @@ public class DonacionDAO {
     }
 
     public boolean eliminar(int id) {
-        String sql = "DELETE FROM Donaciones WHERE id_donacion = ?";
+        String sql = "DELETE FROM donaciones WHERE id_donacion = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 

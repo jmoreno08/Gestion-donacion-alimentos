@@ -14,7 +14,7 @@ import java.util.List;
 public class ProductoDAO {
 
     public boolean insertar(ProductoDTO dto) {
-        String sql = "INSERT INTO Productos (nombre_producto, categoria, unidad_medida, fecha_vencimiento) "
+        String sql = "INSERT INTO productos (nombre_producto, categoria, unidad_medida, fecha_vencimiento) "
                    + "VALUES (?, ?, ?, ?)";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -35,7 +35,7 @@ public class ProductoDAO {
     }
 
     public ProductoDTO consultarPorId(int id) {
-        String sql = "SELECT * FROM Productos WHERE id_producto = ?";
+        String sql = "SELECT * FROM productos WHERE id_producto = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -51,7 +51,7 @@ public class ProductoDAO {
 
     public List<ProductoDTO> consultarTodos() {
         List<ProductoDTO> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Productos ORDER BY nombre_producto";
+        String sql = "SELECT * FROM productos ORDER BY nombre_producto";
         try (Connection con = ConexionBD.getConexion();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -66,7 +66,7 @@ public class ProductoDAO {
 
     public List<ProductoDTO> consultarPorCategoria(String categoria) {
         List<ProductoDTO> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Productos WHERE categoria = ? ORDER BY nombre_producto";
+        String sql = "SELECT * FROM productos WHERE categoria = ? ORDER BY nombre_producto";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -81,7 +81,7 @@ public class ProductoDAO {
     }
 
     public boolean actualizar(ProductoDTO dto) {
-        String sql = "UPDATE Productos SET nombre_producto=?, categoria=?, "
+        String sql = "UPDATE productos SET nombre_producto=?, categoria=?, "
                    + "unidad_medida=?, fecha_vencimiento=? WHERE id_producto=?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -101,7 +101,7 @@ public class ProductoDAO {
     }
 
     public boolean eliminar(int id) {
-        String sql = "DELETE FROM Productos WHERE id_producto = ?";
+        String sql = "DELETE FROM productos WHERE id_producto = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 

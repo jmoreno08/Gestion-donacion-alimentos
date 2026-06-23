@@ -14,7 +14,7 @@ import java.util.List;
 public class BeneficiarioDAO {
 
     public boolean insertar(BeneficiarioDTO dto) {
-        String sql = "INSERT INTO Beneficiarios (nombre, documento, telefono, direccion, "
+        String sql = "INSERT INTO beneficiarios (nombre, documento, telefono, direccion, "
                    + "numero_integrantes, condicion) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -37,7 +37,7 @@ public class BeneficiarioDAO {
     }
 
     public BeneficiarioDTO consultarPorId(int id) {
-        String sql = "SELECT * FROM Beneficiarios WHERE id_beneficiario = ?";
+        String sql = "SELECT * FROM beneficiarios WHERE id_beneficiario = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -53,7 +53,7 @@ public class BeneficiarioDAO {
 
     public List<BeneficiarioDTO> consultarTodos() {
         List<BeneficiarioDTO> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Beneficiarios ORDER BY nombre";
+        String sql = "SELECT * FROM beneficiarios ORDER BY nombre";
         try (Connection con = ConexionBD.getConexion();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -67,7 +67,7 @@ public class BeneficiarioDAO {
     }
 
     public boolean actualizar(BeneficiarioDTO dto) {
-        String sql = "UPDATE Beneficiarios SET nombre=?, documento=?, telefono=?, "
+        String sql = "UPDATE beneficiarios SET nombre=?, documento=?, telefono=?, "
                    + "direccion=?, numero_integrantes=?, condicion=? WHERE id_beneficiario=?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -89,7 +89,7 @@ public class BeneficiarioDAO {
     }
 
     public boolean eliminar(int id) {
-        String sql = "DELETE FROM Beneficiarios WHERE id_beneficiario = ?";
+        String sql = "DELETE FROM beneficiarios WHERE id_beneficiario = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 

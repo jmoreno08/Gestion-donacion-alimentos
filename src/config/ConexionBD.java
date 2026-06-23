@@ -10,15 +10,26 @@ import java.sql.SQLException;
  */
 public class ConexionBD {
 
-    // Para Integrante 3 – BD: por favor reemplazar estos tres valores con los datos reales
-    private static final String URL      = "jdbc:mysql://localhost:3306/NOMBRE_BASE_DE_DATOS";
-    private static final String USUARIO  = "USUARIO_MYSQL";
-    private static final String PASSWORD = "CONTRASEÑA_MYSQL";
+    private static final String DB_HOST = getEnv("DB_HOST", "localhost");
+    private static final String DB_PORT = getEnv("DB_PORT", "3306");
+    private static final String DB_NAME = getEnv("DB_NAME", "gestion_donacion_alimentos");
+    private static final String URL = getEnv(
+        "DB_URL",
+        "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME
+            + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+    );
+    private static final String USUARIO = getEnv("DB_USER", "root");
+    private static final String PASSWORD = getEnv("DB_PASSWORD", "root");
 
     private static Connection instancia = null;
 
     // Constructor privado: evita instanciación directa
     private ConexionBD() {}
+
+    private static String getEnv(String nombre, String valorPorDefecto) {
+        String valor = System.getenv(nombre);
+        return valor == null || valor.isBlank() ? valorPorDefecto : valor;
+    }
 
     /**
      * Retorna la conexión activa. Si no existe o está cerrada, crea una nueva.
