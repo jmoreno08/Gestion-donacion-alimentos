@@ -294,7 +294,13 @@ java -jar app.jar server
 
 ---
 
-# Definición de Entidades
+# Estado Actual del Modelo Implementado
+
+El SQL ejecutable del proyecto se encuentra en `database/gestion_donacion_alimentos.sql`. Ese script crea la base `gestion_donacion_alimentos` con las tablas usadas por los DAO y por el backend HTTP actual.
+
+El documento `docs/modelo_relacional_donacion_alimentos.md` describe una propuesta normalizada más amplia con `detalle_donacion`, `detalle_entrega`, categorías e inventario por lote. Esa propuesta queda documentada como evolución del modelo, pero no está implementada todavía en el SQL ni en el backend actual.
+
+# Definición de Entidades Implementadas
 
 ## Donantes
 
@@ -331,19 +337,6 @@ java -jar app.jar server
 | unidad_medida | VARCHAR(20) | Kg, Litro, Unidad |
 | fecha_vencimiento | DATE | Fecha de vencimiento |
 
----
-
-## Detalle_Donacion
-
-| Campo | Tipo | Descripción |
-|---------|---------|---------|
-| id_detalle_donacion | INT PK | Identificador único |
-| id_donacion | INT FK | Donación relacionada |
-| id_producto | INT FK | Producto relacionado |
-| cantidad | DECIMAL(10,2) | Cantidad donada |
-
----
-
 ## Beneficiarios
 
 | Campo | Tipo | Descripción |
@@ -368,27 +361,13 @@ java -jar app.jar server
 | responsable | VARCHAR(100) | Responsable de la entrega |
 | observacion | VARCHAR(200) | Observaciones |
 
----
-
-## Detalle_Entrega
-
-| Campo | Tipo | Descripción |
-|---------|---------|---------|
-| id_detalle_entrega | INT PK | Identificador único |
-| id_entrega | INT FK | Entrega relacionada |
-| id_producto | INT FK | Producto relacionado |
-| cantidad | DECIMAL(10,2) | Cantidad entregada |
-
----
-
 # Relaciones Principales
 
 - Un Donante puede realizar muchas Donaciones.
-- Una Donación puede contener varios Productos.
-- Un Producto puede estar presente en varias Donaciones.
 - Un Beneficiario puede recibir varias Entregas.
-- Una Entrega puede contener varios Productos.
-- Un Producto puede aparecer en múltiples Entregas.
+- La tabla `productos` funciona como catálogo simple de alimentos con categoría, unidad y fecha de vencimiento.
+- El modelo implementado no registra aún detalle por lote ni detalle de productos entregados.
+- La documentación de modelo normalizado propone agregar `detalle_donacion` y `detalle_entrega` para mejorar trazabilidad de inventario.
 
 ---
 
@@ -397,29 +376,22 @@ java -jar app.jar server
 ```text
 sistema-donacion-alimentos/
 │
+├── .dockerignore
+├── .gitignore
 ├── README.md
 ├── pom.xml
 ├── Dockerfile
 ├── docker-compose.yml
-├── .dockerignore
 ├── Gestion_Donacion_Alimentos_Postman_Collection.json
 │
 ├── docs/
 │   ├── problematica.md
-│   ├── modelo-relacional.md
-│   ├── normalizacion.md
-│   ├── evidencias.md
-│   └── guion-video.md
+│   ├── modelo_relacional_donacion_alimentos.md
+│   ├── Entrega 2 - Punto 4.md
+│   └── evidencias.md
 │
 ├── database/
-│   ├── 01_crear_base_datos.sql
-│   ├── 02_crear_tablas.sql
-│   ├── 03_insertar_datos.sql
-│   └── 04_consultas.sql
-│
-├── diagrams/
-│   ├── modelo-logico.png
-│   └── modelo-relacional.png
+│   └── gestion_donacion_alimentos.sql
 │
 ├── src/
 │   ├── dto/
@@ -443,13 +415,6 @@ sistema-donacion-alimentos/
 │   │   └── BackendServer.java
 │   │
 │   └── Main.java
-│
-└── evidencias/
-    ├── modelo.png
-    ├── tablas.png
-    ├── inserciones.png
-    ├── consultas.png
-    └── dao-dto.png
 ```
 
 ---
