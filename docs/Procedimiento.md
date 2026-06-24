@@ -264,10 +264,10 @@ El procedimiento usa `START TRANSACTION` / `COMMIT` / `ROLLBACK` explícitos. La
 
 | Escenario | INSERT entregas | UPDATE donaciones | Resultado final |
 |-----------|:-:|:-:|---------|
-| Todo correcto | ✅ Se ejecuta | ✅ Se ejecuta | `COMMIT` — cambios permanentes |
-| Beneficiario no existe | ❌ No se ejecuta | ❌ No se ejecuta | `ROLLBACK` — nada cambia |
-| Donación ya entregada | ❌ No se ejecuta | ❌ No se ejecuta | `ROLLBACK` — nada cambia |
-| Error interno de SQL | ✅ Intentado | ✅ Intentado | `ROLLBACK` — todo revertido |
+| Todo correcto | Se ejecuta | Se ejecuta | `COMMIT` — cambios permanentes |
+| Beneficiario no existe | No se ejecuta | No se ejecuta | `ROLLBACK` — nada cambia |
+| Donación ya entregada | No se ejecuta | No se ejecuta | `ROLLBACK` — nada cambia |
+| Error interno de SQL | Intentado | Intentado | `ROLLBACK` — todo revertido |
 
 ---
 
